@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+import os
+import csv
+import glob
+#import m
+
 import scrapy
 
 
@@ -20,7 +25,12 @@ class MoviesSpider(scrapy.Spider):
 			title = movie.xpath('.//*[@class="lister-item-header"]/a/text()').extract_first()
 			year = movie.xpath('.//*[@class="lister-item-header"]/span[2]/text()').extract_first()[1:5]
 			certificate = movie.xpath('.//p[1]/*[@class="certificate"]/text()').extract_first()
-			runtime = movie.xpath('.//p[1]/span[3]/text()').extract_first()
+			rtime = movie.xpath('.//p[1]/span[3]/text()').extract_first()
+			runtime=0
+			if rtime:
+				runtime = rtime.replace(' min','')
+				
+			#runtime = movie.xpath('.//p[1]/span[3]/text()').extract_first().replace(' min','')
 			#genre = movie.xpath('.//p[1]/*[@class="genre"]/text()').extract_first().strip().split(",")[0]
 			genres = movie.xpath('.//p[1]/*[@class="genre"]/text()').extract_first()
 			desc = movie.xpath('.//p[2]/text()').extract_first()
