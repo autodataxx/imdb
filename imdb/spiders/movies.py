@@ -26,7 +26,7 @@ class MoviesSpider(scrapy.Spider):
 			desc = movie.xpath('.//p[2]/text()').extract_first()
 			votes = movie.xpath('.//*[@class="sort-num_votes-visible"]/*[@name="nv"]/@data-value').extract_first()
 			rate = movie.xpath('.//*[@class="ratings-bar"]/*[@name="ir"]/@data-value').extract_first()
-			#imgurl = movie.xpath('.//*[@class="lister-item-image float-left"]/a/*[@class="loadlate"]/@src').extract_first()
+			imgurl = movie.xpath('.//*[@class="lister-item-image float-left"]/a/*[@class="loadlate"]/@loadlate').extract_first()
 			url = movie.xpath('.//*[@class="lister-item-header"]/a/@href').extract_first()
 			absolute_url = response.urljoin(url)
 			
@@ -37,7 +37,7 @@ class MoviesSpider(scrapy.Spider):
 					'genres':genres,
 					'votes':votes,
 					'rate':rate,
-					#'imgurl':imgurl,
+					'imgurl':imgurl,
 					'desc':desc
 					}
 
