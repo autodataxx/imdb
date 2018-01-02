@@ -2,7 +2,7 @@
 import os
 import csv
 import glob
-#import m
+import MySQLdb
 
 import scrapy
 
@@ -32,8 +32,8 @@ class MoviesSpider(scrapy.Spider):
 				
 			#runtime = movie.xpath('.//p[1]/span[3]/text()').extract_first().replace(' min','')
 			#genre = movie.xpath('.//p[1]/*[@class="genre"]/text()').extract_first().strip().split(",")[0]
-			genres = movie.xpath('.//p[1]/*[@class="genre"]/text()').extract_first()
-			desc = movie.xpath('.//p[2]/text()').extract_first()
+			genres = movie.xpath('.//p[1]/*[@class="genre"]/text()').extract_first().rstrip().strip()
+			desc = movie.xpath('.//p[2]/text()').extract_first().rstrip().strip()
 			votes = movie.xpath('.//*[@class="sort-num_votes-visible"]/*[@name="nv"]/@data-value').extract_first()
 			rate = movie.xpath('.//*[@class="ratings-bar"]/*[@name="ir"]/@data-value').extract_first()
 			imgurl = movie.xpath('.//*[@class="lister-item-image float-left"]/a/*[@class="loadlate"]/@loadlate').extract_first()
@@ -54,3 +54,18 @@ class MoviesSpider(scrapy.Spider):
 		next_page_url =  response.xpath('//*[@class="lister-page-next next-page"]/@href').extract_first()
 		absolute_text_page_url = response.urljoin(next_page_url)
 		yield scrapy.Request(absolute_text_page_url)
+
+    def close(self,reason):
+        csv_file = max(glob.iglob('*.csv'), key=os.path.getctime)
+        print csv_file
+        mydb = MySQLdb.connect(host="207.246.126.155",port=3306,user="lester", passwd="123456xl",db="imdb")
+        cursor = mydb.cursor()
+        csv_data = csv.reader(file(csv_file))
+        
+        row_count =0
+        for row in csv_data:
+			if row_count !=0:
+				cursor.execute('INSERT IGNORE INTO movie(genres,runtime,certificate,title,rate,year,votes,imgurl,description) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)', row)
+			row_count += 1
+        mydb.commit()
+        cursor.close()
